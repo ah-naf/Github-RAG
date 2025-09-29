@@ -1,5 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from extensions import LANG_EXTS, TEXT_EXTS
+from .extensions import LANG_EXTS, TEXT_EXTS
 import os
 
 def _ext(path):
@@ -11,11 +11,11 @@ class CodeSplitter:
         self.chunk_overlap = chunk_overlap
     
     def _language_for(self, path):
-        return LANG_EXTS.get(_ext(path))
+        ext = _ext(path)
+        return LANG_EXTS.get(ext), ext
 
     def split(self, path, text):
-        lang = self._language_for(path)
-        
+        lang, ext = self._language_for(path)
         if lang:
             splitter = RecursiveCharacterTextSplitter.from_language(
                 language = lang,
@@ -29,7 +29,7 @@ class CodeSplitter:
                 chunk_overlap=self.chunk_overlap,
                 separators=["\n\n", "\n", " ", ""],
             )
-            meta = {"mode": "generic", "language": lang}
+            meta = {"mode": "generic", "language": ext}
         
         chunks = splitter.split_text(text)
         return chunks, meta

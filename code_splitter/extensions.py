@@ -13,6 +13,7 @@ LANG_EXTS = {
     ".php": Language.PHP,
     ".rs": Language.RUST,
     ".swift": Language.SWIFT,
+    ".sh": Language.POWERSHELL, ".bash": Language.POWERSHELL
 }
 
 TEXT_EXTS = {
