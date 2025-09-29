@@ -1,2 +1,3 @@
 langchain-core==0.3.76
 langchain-text-splitters==0.3.11
+python-dotenv
