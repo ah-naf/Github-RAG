@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
+import { RepoForm } from './type';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +23,7 @@ import { PasswordModule } from 'primeng/password';
 export class App {
   repoForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.repoForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       repoName: ['', [Validators.required]],
@@ -31,8 +33,12 @@ export class App {
 
   onSubmit() {
     if (this.repoForm.valid) {
-      console.log('Form Data:', this.repoForm.value);
-      // You can add service call here
+      const repoForm: RepoForm = this.repoForm.value;
+      localStorage.setItem('repoForm', JSON.stringify(repoForm));
+      
+      this.router.navigate(["/repo"], {
+        queryParams: repoForm
+      })
     } else {
       this.repoForm.markAllAsTouched();
     }
