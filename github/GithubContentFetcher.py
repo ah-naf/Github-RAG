@@ -24,10 +24,12 @@ class GithubContentFetcher:
         self.max_file_bytes = max_file_bytes
 
         tok = token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+        
         self.headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": api_version,
         }
+        
         if tok:
             self.headers["Authorization"] = f"Bearer {tok}"
 
@@ -50,17 +52,17 @@ class GithubContentFetcher:
         Structure is similar to your previous walk_files.
         """
         with self.download_zip(ref) as zf:
-            root_prefix = zf.namelist()[0] 
-            
+            root_prefix = zf.namelist()[0]
+
             for name in zf.namelist():
                 if name.endswith("/"):
                     continue
-                
+
                 info = zf.getinfo(name)
-                
+
                 if info.file_size > self.max_file_bytes:
                     continue
-                
+
                 path = name[len(root_prefix):]
                 raw = zf.read(name)
 
@@ -69,6 +71,7 @@ class GithubContentFetcher:
                 except UnicodeDecodeError:
                     content = raw.decode("utf-8", errors="ignore")
 
+                
                 chunks, meta = CodeSplitter().split(path, content)
 
                 yield {
