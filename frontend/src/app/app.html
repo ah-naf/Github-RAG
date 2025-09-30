@@ -1,35 +1,51 @@
-<div class="home-container">
-  <h1 class="title">ChatRepo</h1>
-  <p class="description">
-    ChatRepo is an AI-powered RAG application that can interact with your GitHub repositories.
-    Enter your repository details below to get started.
-  </p>
-
-  <form [formGroup]="repoForm" (ngSubmit)="onSubmit()" novalidate>
-    <div class="form-field">
-      <label for="username">GitHub Username</label>
-      <input pInputText id="username" formControlName="username" placeholder="Enter your username" />
-      <small *ngIf="repoForm.controls['username'].touched && repoForm.controls['username'].invalid" class="error">
-        Username is required (min 3 characters).
-      </small>
+<div class="home">
+  <div class="home-wrapper">
+    
+    <!-- Title + Description -->
+    <div class="intro-text">
+      <h1 class="title">ChatRepo</h1>
+      <p class="description">
+        ChatRepo is an AI-powered RAG application that lets you interact with your GitHub repositories seamlessly.
+        Enter your details to get started.
+      </p>
     </div>
 
-    <div class="form-field">
-      <label for="repoName">Repository Name</label>
-      <input pInputText id="repoName" formControlName="repoName" placeholder="Enter repository name" />
-      <small *ngIf="repoForm.controls['repoName'].touched && repoForm.controls['repoName'].invalid" class="error">
-        Repository name is required.
-      </small>
+    <!-- Left Section (Illustration) -->
+    <div class="left-section">
+      <img src="home.svg" alt="ChatRepo Illustration" class="illustration" />
     </div>
 
-    <div class="form-field">
-      <label for="accessToken">Access Token</label>
-      <input pPassword id="accessToken" formControlName="accessToken" [feedback]="false" toggleMask="true" placeholder="Enter access token" />
-      <small *ngIf="repoForm.controls['accessToken'].touched && repoForm.controls['accessToken'].invalid" class="error">
-        Access token is required (min 10 characters).
-      </small>
-    </div>
+    <!-- Right Section (Form) -->
+    <div class="right-section">
+      <form [formGroup]="repoForm" (ngSubmit)="onSubmit()" novalidate>
+        
+        <div class="form-field">
+          <label for="username">GitHub Username</label>
+          <input pInputText id="username" formControlName="username" placeholder="Enter your username" />
+          <small *ngIf="repoForm.controls['username'].touched && repoForm.controls['username'].invalid" class="error">
+            Username is required (min 3 characters).
+          </small>
+        </div>
 
-    <button pButton type="submit" label="Connect" class="submit-btn"></button>
-  </form>
+        <div class="form-field">
+          <label for="repoName">Repository Name</label>
+          <input pInputText id="repoName" formControlName="repoName" placeholder="Enter repository name" />
+          <small *ngIf="repoForm.controls['repoName'].touched && repoForm.controls['repoName'].invalid" class="error">
+            Repository name is required.
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="accessToken">Access Token</label>
+          <input pPassword id="accessToken" formControlName="accessToken" [feedback]="false" toggleMask="true" placeholder="Enter access token" />
+          <small *ngIf="repoForm.controls['accessToken'].touched && repoForm.controls['accessToken'].invalid" class="error">
+            Access token is required (min 10 characters).
+          </small>
+        </div>
+
+        <button pButton type="submit" label="Connect" class="submit-btn"></button>
+      </form>
+    </div>
+  </div>
 </div>
+
