@@ -30,7 +30,7 @@
 /* Main content: only this scrolls */
 .content-wrapper {
   height: calc(100vh - 140px); /* fits under topbar; adjust if needed */
-  padding: 0 2rem 1.25rem 2rem;
+  padding: 0 1rem 1.25rem 1rem;
 }
 
 .content-scroll {
