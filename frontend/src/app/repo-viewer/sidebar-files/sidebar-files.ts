@@ -2,14 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { TreeNode } from 'primeng/api';
-import { Badge } from 'primeng/badge';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Tree } from 'primeng/tree';
 
 @Component({
   selector: 'app-repo-viewer-sidebar-files',
   standalone: true,
-  imports: [CommonModule, Badge, ProgressSpinner, Tree],
+  imports: [CommonModule, ProgressSpinner, Tree],
   templateUrl: './sidebar-files.html',
   styleUrl: './sidebar-files.css',
 })

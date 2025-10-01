@@ -29,7 +29,7 @@
 
 /* Main content: only this scrolls */
 .content-wrapper {
-  height: calc(100vh - 140px); /* fits under topbar; adjust if needed */
+  height: calc(100vh - 210px); /* fits under topbar; adjust if needed */
   padding: 0 1rem 1.25rem 1rem;
 }
 
@@ -45,12 +45,17 @@
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 1.5rem;
+  height: 100%;
 }
 
 /* Child containers share original panel styles */
 .left,
 .right {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;       /* fill grid row */
+  overflow: auto;   /* independent vertical scroll */
+  /* overflow-x: hidden; */
 }
 
 /* Light scrollbar */
