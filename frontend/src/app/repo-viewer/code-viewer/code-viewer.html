@@ -45,8 +45,7 @@
         @if (loadingFile) {
           <p-progressSpinner strokeWidth="3"></p-progressSpinner>
         } @else {
-          <!-- (No syntax highlight — pre/code like GitHub simple view) -->
-          <pre class="code-block"><code>{{ fileContent }}</code></pre>
+           <pre class="code-block"><code class="language-{{ getFileLanguage(selectedFile.name) }}">{{ fileContent.trim() }}</code></pre>
         }
       </div>
     </div>

@@ -194,6 +194,7 @@ export class RepoViewer implements OnInit {
       .getFileContent(repoInfo.username, repoInfo.repoName, path, this.selectedBranch)
       .subscribe({
         next: (file) => {
+          console.log(file)
           this.selectedFile = file ?? null;
           const encoding = file?.encoding ?? '';
           const content = file?.content ?? '';
@@ -247,39 +248,6 @@ export class RepoViewer implements OnInit {
   // ===== Helpers =====
   getFileIconClass(filename: string): string {
     return this.githubService.getFileIcon(filename ?? '');
-  }
-
-  getLanguageFromFile(filename: string): string {
-    const ext = filename?.split('.').pop()?.toLowerCase();
-    const langMap: { [key: string]: string } = {
-      ts: 'typescript',
-      js: 'javascript',
-      jsx: 'javascript',
-      tsx: 'typescript',
-      html: 'xml',
-      css: 'css',
-      scss: 'scss',
-      json: 'json',
-      xml: 'xml',
-      py: 'python',
-      java: 'java',
-      c: 'c',
-      cpp: 'cpp',
-      cs: 'csharp',
-      go: 'go',
-      rs: 'rust',
-      php: 'php',
-      rb: 'ruby',
-      swift: 'swift',
-      kt: 'kotlin',
-      md: 'markdown',
-      yaml: 'yaml',
-      yml: 'yaml',
-      sql: 'sql',
-      sh: 'bash',
-      bash: 'bash',
-    };
-    return langMap[ext || ''] || 'plaintext';
   }
 
   formatFileSize(bytes: number): string {
