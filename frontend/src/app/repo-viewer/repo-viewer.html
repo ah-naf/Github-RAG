@@ -1,235 +1,47 @@
 <div class="repo-viewer-container">
-  <!-- Toast for global notifications -->
+  <!-- Global Toast -->
   <p-toast></p-toast>
 
-  <!-- Header Section -->
-  <div class="repo-header">
-    <div class="header-content">
-      <div class="repo-info">
-        <div class="repo-title-section">
-          <i class="pi pi-github" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+  <!-- Topbar -->
+  <app-repo-viewer-topbar
+    [repoData]="repoData"
+    [branches]="branches"
+    [selectedBranch]="selectedBranch"
+    [loadingBranches]="loading.branches"
+    (branchChange)="onBranchChange($event)"
+    (clearCredentials)="clearCredentials()"
+    [formatDateFn]="formatDate.bind(this)"
+    [githubService]="githubService"
+  ></app-repo-viewer-topbar>
 
-          @if (repoData) {
-            <div class="repo-name-wrapper">
-              <span class="owner-name">{{ repoData.owner.login }}</span>
-              <span class="separator">/</span>
-              <span class="repo-name">{{ repoData.name }}</span>
-
-              @if (repoData.private) {
-                <p-chip label="Private" icon="pi pi-lock" styleClass="private-badge"></p-chip>
-              } @else {
-                <p-chip label="Public" icon="pi pi-globe" styleClass="public-badge"></p-chip>
-              }
-            </div>
-          } @else {
-            <div class="repo-name-wrapper">
-              <span class="owner-name">—</span>
-              <span class="separator">/</span>
-              <span class="repo-name">—</span>
-              <p-chip label="—" styleClass="public-badge"></p-chip>
-            </div>
-          }
-        </div>
-
-        @if (repoData?.description) {
-          <div class="repo-description">
-            {{ repoData?.description }}
-          </div>
-        }
-
-        @if (repoData) {
-          <div class="repo-stats">
-            <div class="stat-item" pTooltip="Stars">
-              <i class="pi pi-star"></i>
-              <span>{{ repoData.stargazers_count }}</span>
-            </div>
-            <div class="stat-item" pTooltip="Forks">
-              <i class="pi pi-share-alt"></i>
-              <span>{{ repoData.forks_count }}</span>
-            </div>
-            <div class="stat-item" pTooltip="Watchers">
-              <i class="pi pi-eye"></i>
-              <span>{{ repoData.watchers_count }}</span>
-            </div>
-            @if (repoData.language) {
-              <div class="stat-item" pTooltip="Primary Language">
-                <span
-                  class="language-dot"
-                  [style.backgroundColor]="githubService.getLanguageColor(repoData.language)"
-                ></span>
-                <span>{{ repoData.language }}</span>
-              </div>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="header-actions">
-        <p-button
-          label="Clear Credentials"
-          icon="pi pi-sign-out"
-          styleClass="p-button-danger p-button-outlined"
-          (onClick)="clearCredentials()"
-        ></p-button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Branch Selector -->
-  <div class="branch-selector-wrapper">
-    <div class="branch-controls">
-      <p-select
-        [options]="branches"
-        [(ngModel)]="selectedBranch"
-        optionLabel="name"
-        optionValue="name"
-        placeholder="Select Branch"
-        [loading]="loading.branches"
-        (onChange)="onBranchChange()"
-        styleClass="branch-dropdown"
-      >
-        <ng-template pTemplate="selectedItem">
-          @if (selectedBranch) {
-            <div class="branch-item">
-              <i class="pi pi-code-branch"></i>
-              <span>{{ selectedBranch }}</span>
-            </div>
-          }
-        </ng-template>
-
-        <ng-template let-branch pTemplate="item">
-          <div class="branch-item">
-            <i class="pi pi-code-branch"></i>
-            <span>{{ branch?.name ?? '—' }}</span>
-            @if (branch?.protected) {
-              <i class="pi pi-shield" pTooltip="Protected branch"></i>
-            }
-          </div>
-        </ng-template>
-      </p-select>
-
-      @if (repoData) {
-        <div class="repo-meta">
-          <span class="meta-item">
-            <i class="pi pi-calendar"></i>
-            Created {{ formatDate(repoData.created_at) }}
-          </span>
-          <span class="meta-item">
-            <i class="pi pi-refresh"></i>
-            Updated {{ formatDate(repoData.updated_at) }}
-          </span>
-        </div>
-      }
-    </div>
-  </div>
-
-  <!-- Main Content Area -->
+  <!-- Main Content (only this area scrolls) -->
   <div class="content-wrapper">
-    <!-- File Tree Sidebar -->
-    <div class="file-tree-panel">
-      <div class="panel-header">
-        <i class="pi pi-folder-open"></i>
-        <span>Files</span>
-        <p-badge [value]="fileTree.length" styleClass="file-count"></p-badge>
+    <div class="content-scroll">
+      <div class="columns">
+        <!-- Left: File Tree -->
+        <app-repo-viewer-sidebar-files
+          class="left"
+          [fileTree]="fileTree"
+          [loadingTree]="loading.tree"
+          (nodeSelect)="onNodeSelect($event)"
+          [fileCount]="fileTree.length || 0"
+        ></app-repo-viewer-sidebar-files>
+
+        <!-- Right: Code Viewer -->
+        <app-repo-viewer-code-viewer
+          class="right"
+          [breadcrumbs]="breadcrumbs"
+          [selectedFile]="selectedFile"
+          [fileContent]="fileContent"
+          [loadingFile]="loading.file"
+          [error]="error"
+          [getFileIconClassFn]="getFileIconClass.bind(this)"
+          [formatFileSizeFn]="formatFileSize.bind(this)"
+          (copy)="copyToClipboard($event)"
+          (download)="downloadSelectedFile()"
+          (retry)="loadRepository()"
+        ></app-repo-viewer-code-viewer>
       </div>
-
-      <div class="tree-container">
-        @if (loading.tree) {
-          <p-progressSpinner strokeWidth="3" styleClass="tree-loader"></p-progressSpinner>
-        } @else {
-          <p-tree
-            [value]="fileTree"
-            selectionMode="single"
-            (onNodeSelect)="onNodeSelect($event)"
-            [filter]="true"
-            filterPlaceholder="Search files..."
-            styleClass="file-tree"
-          >
-            <ng-template let-node pTemplate="default">
-              <div class="tree-node-content">
-                <i
-                  [class]="node?.icon"
-                  [style.color]="node?.data?.type === 'tree' ? '#54aeff' : '#8b949e'"
-                ></i>
-                <span class="node-label">{{ node?.label ?? '—' }}</span>
-              </div>
-            </ng-template>
-          </p-tree>
-        }
-      </div>
-    </div>
-
-    <!-- File Content Area -->
-    <div class="file-content-panel">
-      <!-- Breadcrumb -->
-      @if (breadcrumbs.length > 0) {
-        <div class="breadcrumb-bar">
-          <div class="breadcrumb-path">
-            <span class="breadcrumb-item" *ngFor="let crumb of breadcrumbs; let last = last">
-              <i class="pi pi-angle-right" *ngIf="!last"></i>
-              {{ crumb ?? '—' }}
-            </span>
-          </div>
-
-          @if (selectedFile) {
-            <div class="file-actions">
-              <p-button
-                icon="pi pi-copy"
-                styleClass="p-button-text p-button-sm"
-                (onClick)="copyToClipboard(fileContent)"
-              ></p-button>
-              <p-button
-                icon="pi pi-download"
-                styleClass="p-button-text p-button-sm"
-                (onClick)="downloadFile()"
-              ></p-button>
-            </div>
-          }
-        </div>
-      }
-
-      <!-- File Viewer -->
-      @if (selectedFile) {
-        <div class="file-viewer">
-          <div class="file-info-bar">
-            <div class="file-meta">
-              <i [class]="getFileIconClass(selectedFile.name)"></i>
-              <span class="file-name">{{ selectedFile.name }}</span>
-              <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
-            </div>
-          </div>
-
-          <div class="code-container">
-            @if (loading.file) {
-              <p-progressSpinner strokeWidth="3"></p-progressSpinner>
-            } @else {
-              <!-- No [highlight]; show as text -->
-              <pre class="code-block"><code>{{ fileContent }}</code></pre>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Empty State -->
-      @if (!selectedFile && !loading.tree) {
-        <div class="empty-state">
-          <i class="pi pi-file-o" style="font-size: 3rem; color: #8b949e;"></i>
-          <h3>Select a file to view</h3>
-          <p>Choose a file from the tree to view its contents</p>
-          <p-message severity="info" text="Tip: use the file tree filter to find files quickly."></p-message>
-        </div>
-      }
-
-      <!-- Error State -->
-      @if (error) {
-        <div class="error-state">
-          <i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: #f85149;"></i>
-          <h3>Error</h3>
-          <p>{{ error }}</p>
-          <p-button label="Retry" icon="pi pi-refresh" (onClick)="loadRepository()"></p-button>
-          <p-message severity="error" [text]="error"></p-message>
-        </div>
-      }
     </div>
   </div>
 </div>

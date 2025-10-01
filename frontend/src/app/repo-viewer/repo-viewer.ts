@@ -1,56 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { TreeNode, MessageService } from 'primeng/api';
-import { Avatar } from 'primeng/avatar';
-import { Badge } from 'primeng/badge';
-import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
-import { Chip } from 'primeng/chip';
-import { Divider } from 'primeng/divider';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Skeleton } from 'primeng/skeleton';
-import { Tooltip } from 'primeng/tooltip';
-import { Tree } from 'primeng/tree';
 import { Toast } from 'primeng/toast';
-import { Message } from 'primeng/message';
-import { Select } from 'primeng/select';
 
 import { FileContent, GitHubBranch, GitHubRepo, GitHubTreeItem } from '../type';
 import { GithubService } from '../services/github-service';
 
-interface TreeNodeData extends TreeNode {
-  data?: {
-    path: string;
-    type: 'blob' | 'tree';
-    sha: string;
-  };
-}
+// child components
+import { RepoViewerTopbar } from './topbar/topbar';
+import { RepoViewerSidebarFiles } from './sidebar-files/sidebar-files';
+import { RepoViewerCodeViewer } from './code-viewer/code-viewer';
 
 @Component({
   selector: 'app-repo-viewer',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-
-    // PrimeNG (v20, standalone components)
-    Tree,
-    Button,
-    Card,
-    Chip,
-    Divider,
-    ProgressSpinner,
-    Tooltip,
-    Badge,
-    Avatar,
-    Skeleton,
-    Toast,
-    Message,
-    Select
-  ],
+  imports: [CommonModule, Toast, RepoViewerTopbar, RepoViewerSidebarFiles, RepoViewerCodeViewer],
   providers: [MessageService],
   templateUrl: './repo-viewer.html',
   styleUrl: './repo-viewer.css',
@@ -58,17 +24,16 @@ interface TreeNodeData extends TreeNode {
 export class RepoViewer implements OnInit {
   repoData: GitHubRepo | null = null;
   branches: GitHubBranch[] = [];
-  selectedBranch: string = '';
+  selectedBranch = '';
   fileTree: TreeNode[] = [];
   selectedFile: FileContent | null = null;
-  fileContent: string = '';
+  fileContent = '';
   loading = {
     repo: true,
     branches: true,
     tree: true,
     file: false,
   };
-  expandedNodes: Record<string, boolean> = {};
   breadcrumbs: string[] = [];
   error: string | null = null;
 
@@ -82,9 +47,9 @@ export class RepoViewer implements OnInit {
     this.loadRepository();
   }
 
+  // ===== Data Loading =====
   loadRepository(): void {
     const repoInfo = this.githubService.getRepoInfo();
-
     if (!repoInfo) {
       this.router.navigate(['/']);
       return;
@@ -131,19 +96,17 @@ export class RepoViewer implements OnInit {
     if (!repoInfo) return;
 
     this.loading.tree = true;
-    this.githubService
-      .getRepoTree(repoInfo.username, repoInfo.repoName, this.selectedBranch)
-      .subscribe({
-        next: (items) => {
-          this.fileTree = this.buildTreeNodes(items ?? []);
-          this.loading.tree = false;
-        },
-        error: (err) => {
-          console.error('Error fetching file tree:', err);
-          this.loading.tree = false;
-          this.toastError('File Tree', 'Failed to load file tree');
-        },
-      });
+    this.githubService.getRepoTree(repoInfo.username, repoInfo.repoName, this.selectedBranch).subscribe({
+      next: (items) => {
+        this.fileTree = this.buildTreeNodes(items ?? []);
+        this.loading.tree = false;
+      },
+      error: (err) => {
+        console.error('Error fetching file tree:', err);
+        this.loading.tree = false;
+        this.toastError('File Tree', 'Failed to load file tree');
+      },
+    });
   }
 
   private buildTreeNodes(items: GitHubTreeItem[]): TreeNode[] {
@@ -162,7 +125,7 @@ export class RepoViewer implements OnInit {
       const isFile = item?.type === 'blob';
 
       if (parts.length <= 1) {
-        const node: TreeNodeData = {
+        const node: TreeNode = {
           label: parts[0] ?? '',
           icon: isFile ? this.getFileIconClass(parts[0] ?? '') : 'pi pi-folder',
           data: {
@@ -180,7 +143,7 @@ export class RepoViewer implements OnInit {
         const parentPath = parts.slice(0, -1).join('/');
         const label = parts[parts.length - 1] ?? '';
 
-        const node: TreeNodeData = {
+        const node: TreeNode = {
           label,
           icon: isFile ? this.getFileIconClass(label) : 'pi pi-folder',
           data: {
@@ -207,17 +170,20 @@ export class RepoViewer implements OnInit {
     return rootNodes;
   }
 
-  getFileIconClass(filename: string): string {
-    return this.githubService.getFileIcon(filename ?? '');
-  }
+  // ===== Event Handlers wired to child components =====
+  onBranchChange = (branch: string) => {
+    this.selectedBranch = branch;
+    this.selectedFile = null;
+    this.fileContent = '';
+    this.breadcrumbs = [];
+    this.loadFileTree();
+    this.toastInfo('Branch Changed', this.selectedBranch || '—');
+  };
 
-  onNodeSelect(event: any): void {
-    const node = (event?.node as TreeNodeData) ?? null;
-    if (node?.data?.type === 'blob' && node?.data?.path) {
-      this.loadFileContent(node.data.path);
-      this.updateBreadcrumbs(node.data.path);
-    }
-  }
+  onNodeSelect = (path: string) => {
+    this.loadFileContent(path);
+    this.updateBreadcrumbs(path);
+  };
 
   loadFileContent(path: string): void {
     const repoInfo = this.githubService.getRepoInfo();
@@ -252,18 +218,35 @@ export class RepoViewer implements OnInit {
     this.breadcrumbs = (path ?? '').split('/').filter(Boolean);
   }
 
-  onBranchChange(): void {
-    this.selectedFile = null;
-    this.fileContent = '';
-    this.breadcrumbs = [];
-    this.loadFileTree();
-    this.toastInfo('Branch Changed', this.selectedBranch || '—');
-  }
-
-  clearCredentials(): void {
+  clearCredentials = () => {
     this.githubService.clearRepoInfo();
     this.toastInfo('Signed out', 'Credentials cleared');
     this.router.navigate(['/']);
+  };
+
+  copyToClipboard = (text: string) => {
+    navigator.clipboard
+      .writeText(text ?? '')
+      .then(() => this.toastInfo('Copied', 'Content copied to clipboard'))
+      .catch(() => this.toastError('Clipboard', 'Failed to copy content'));
+  };
+
+  downloadSelectedFile = () => {
+    if (this.selectedFile) {
+      const blob = new Blob([this.fileContent ?? ''], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.selectedFile?.name ?? 'file.txt';
+      a.click();
+      window.URL.revokeObjectURL(url);
+      this.toastInfo('Download', 'File downloaded');
+    }
+  };
+
+  // ===== Helpers =====
+  getFileIconClass(filename: string): string {
+    return this.githubService.getFileIcon(filename ?? '');
   }
 
   getLanguageFromFile(filename: string): string {
@@ -314,30 +297,6 @@ export class RepoViewer implements OnInit {
       month: 'short',
       day: 'numeric',
     });
-  }
-
-  copyToClipboard(text: string): void {
-    navigator.clipboard
-      .writeText(text ?? '')
-      .then(() => {
-        this.toastInfo('Copied', 'Content copied to clipboard');
-      })
-      .catch(() => {
-        this.toastError('Clipboard', 'Failed to copy content');
-      });
-  }
-
-  downloadFile(): void {
-    if (this.selectedFile) {
-      const blob = new Blob([this.fileContent ?? ''], { type: 'text/plain' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = this.selectedFile?.name ?? 'file.txt';
-      a.click();
-      window.URL.revokeObjectURL(url);
-      this.toastInfo('Download', 'File downloaded');
-    }
   }
 
   // Toast helpers

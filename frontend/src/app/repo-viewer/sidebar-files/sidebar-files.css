@@ -1,0 +1,86 @@
+.file-tree-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 24px var(--shadow);
+  min-height: 480px;
+}
+
+.panel-header {
+  padding: 0.9rem 1rem;
+  background: linear-gradient(180deg, #ffffff 0%, #fff5f2 100%);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.panel-header i { color: var(--primary); }
+
+.file-count .p-badge {
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
+.tree-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  position: relative;
+}
+
+.tree-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* PrimeNG Tree */
+.file-tree.p-tree { background: transparent; border: none; color: var(--text); padding: 0; }
+.file-tree .p-tree-container { padding: 0; }
+.file-tree .p-treenode { padding: 0.15rem 0; }
+
+.file-tree .p-treenode-content {
+  padding: 0.45rem 0.6rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: all 0.15s;
+  color: var(--text);
+}
+.file-tree .p-treenode-content:hover { background: #f3f4f6; border-color: var(--border); }
+.file-tree .p-treenode-content.p-highlight {
+  background: var(--primary-100);
+  border-color: var(--primary-300);
+  color: #0b3c9d;
+  font-weight: 600;
+}
+
+/* Tree filter */
+.file-tree .p-tree-filter-container { margin-bottom: 0.75rem; }
+.file-tree .p-tree-filter {
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  width: 100%;
+  transition: all 0.2s;
+}
+.file-tree .p-tree-filter:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  outline: none;
+}
+.file-tree .p-tree-filter::placeholder { color: var(--text-subtle); }
+
+.tree-node-content { display: flex; align-items: center; gap: 0.5rem; }
+.tree-node-content i { color: var(--text-muted); }
+.node-label { font-size: 0.95rem; }

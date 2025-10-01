@@ -1,0 +1,32 @@
+<div class="file-tree-panel">
+  <div class="panel-header">
+    <i class="pi pi-folder-open"></i>
+    <span>Files</span>
+    <p-badge [value]="fileCount" styleClass="file-count"></p-badge>
+  </div>
+
+  <div class="tree-container">
+    @if (loadingTree) {
+      <p-progressSpinner strokeWidth="3" styleClass="tree-loader"></p-progressSpinner>
+    } @else {
+      <p-tree
+        [value]="fileTree"
+        selectionMode="single"
+        (onNodeSelect)="onNodeSelect($event)"
+        [filter]="true"
+        filterPlaceholder="Search files..."
+        styleClass="file-tree"
+      >
+        <ng-template let-node pTemplate="default">
+          <div class="tree-node-content">
+            <i
+              [class]="node?.icon"
+              [style.color]="node?.data?.type === 'tree' ? '#54aeff' : '#8b949e'"
+            ></i>
+            <span class="node-label">{{ node?.label ?? '—' }}</span>
+          </div>
+        </ng-template>
+      </p-tree>
+    }
+  </div>
+</div>

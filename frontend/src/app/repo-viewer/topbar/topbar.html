@@ -1,0 +1,120 @@
+<!-- Header Section -->
+<div class="repo-header">
+  <div class="header-content">
+    <div class="repo-info">
+      <div class="repo-title-section">
+        <i class="pi pi-github" style="font-size: 1.5rem; margin-right: 0.5rem;"></i>
+
+        @if (repoData) {
+          <div class="repo-name-wrapper">
+            <span class="owner-name">{{ repoData.owner.login }}</span>
+            <span class="separator">/</span>
+            <span class="repo-name">{{ repoData.name }}</span>
+
+            @if (repoData.private) {
+              <p-chip label="Private" icon="pi pi-lock" styleClass="private-badge"></p-chip>
+            } @else {
+              <p-chip label="Public" icon="pi pi-globe" styleClass="public-badge"></p-chip>
+            }
+          </div>
+        } @else {
+          <div class="repo-name-wrapper">
+            <span class="owner-name">—</span>
+            <span class="separator">/</span>
+            <span class="repo-name">—</span>
+            <p-chip label="—" styleClass="public-badge"></p-chip>
+          </div>
+        }
+      </div>
+
+      @if (repoData?.description) {
+        <div class="repo-description">
+          {{ repoData?.description }}
+        </div>
+      }
+
+      @if (repoData) {
+        <div class="repo-stats">
+          <div class="stat-item" pTooltip="Stars">
+            <i class="pi pi-star"></i>
+            <span>{{ repoData.stargazers_count }}</span>
+          </div>
+          <div class="stat-item" pTooltip="Forks">
+            <i class="pi pi-share-alt"></i>
+            <span>{{ repoData.forks_count }}</span>
+          </div>
+          <div class="stat-item" pTooltip="Watchers">
+            <i class="pi pi-eye"></i>
+            <span>{{ repoData.watchers_count }}</span>
+          </div>
+          @if (repoData.language) {
+            <div class="stat-item" pTooltip="Primary Language">
+              <span
+                class="language-dot"
+                [style.backgroundColor]="githubService.getLanguageColor(repoData.language)"
+              ></span>
+              <span>{{ repoData.language }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="header-actions">
+      <p-button
+        label="Clear Credentials"
+        icon="pi pi-sign-out"
+        styleClass="p-button-danger p-button-outlined"
+        (onClick)="clearCredentials.emit()"
+      ></p-button>
+    </div>
+  </div>
+</div>
+
+<!-- Branch Selector / Meta -->
+<div class="branch-selector-wrapper">
+  <div class="branch-controls">
+    <p-select
+      [options]="branches"
+      [ngModel]="selectedBranch"
+      (ngModelChange)="onBranchChange($event)"
+      optionLabel="name"
+      optionValue="name"
+      placeholder="Select Branch"
+      [loading]="loadingBranches"
+      styleClass="branch-dropdown"
+    >
+      <ng-template pTemplate="selectedItem">
+        @if (selectedBranch) {
+          <div class="branch-item">
+            <i class="pi pi-code-branch"></i>
+            <span>{{ selectedBranch }}</span>
+          </div>
+        }
+      </ng-template>
+
+      <ng-template let-branch pTemplate="item">
+        <div class="branch-item">
+          <i class="pi pi-code-branch"></i>
+          <span>{{ branch?.name ?? '—' }}</span>
+          @if (branch?.protected) {
+            <i class="pi pi-shield" pTooltip="Protected branch"></i>
+          }
+        </div>
+      </ng-template>
+    </p-select>
+
+    @if (repoData) {
+      <div class="repo-meta">
+        <span class="meta-item">
+          <i class="pi pi-calendar"></i>
+          Created {{ formatDateFn(repoData.created_at) }}
+        </span>
+        <span class="meta-item">
+          <i class="pi pi-refresh"></i>
+          Updated {{ formatDateFn(repoData.updated_at) }}
+        </span>
+      </div>
+    }
+  </div>
+</div>
