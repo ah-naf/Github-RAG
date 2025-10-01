@@ -1,6 +1,6 @@
 .repo-header {
-  background: #e66333;
-  border-bottom: 1px solid #e85a28;
+  background: rgba(0,0,0,0.85);
+  border-bottom: 1px solid black;
   padding: 1rem;
   backdrop-filter: blur(6px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);

@@ -35,11 +35,12 @@ import 'prismjs/components/prism-rust';
 import 'prismjs/components/prism-ruby';
 import 'prismjs/components/prism-swift';
 import 'prismjs/components/prism-kotlin';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-repo-viewer-code-viewer',
   standalone: true,
-  imports: [CommonModule, Button, Message, ProgressSpinner],
+  imports: [CommonModule, Button, Message, ProgressSpinner, Tooltip],
   templateUrl: './code-viewer.html',
   styleUrl: './code-viewer.css',
 })

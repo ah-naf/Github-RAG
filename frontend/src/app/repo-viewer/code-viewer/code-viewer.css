@@ -1,11 +1,11 @@
 .file-content-panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
+  background: white;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 24px var(--shadow);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
   min-height: 0px;
   flex: 1;
 }
@@ -14,7 +14,7 @@
 .breadcrumb-bar {
   padding: 0.7rem 1rem;
   background: #ffffff;
-  border-bottom: 1px solid var(--border);
+  border: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,12 +23,12 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--text-muted);
+  color: #6b7280;
   font-size: 0.9rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 .breadcrumb-item { display: flex; align-items: center; gap: 0.35rem; }
-.breadcrumb-item:last-child { color: var(--text); font-weight: 600; }
+.breadcrumb-item:last-child { color: #1f2937; font-weight: 600; }
 
 .file-actions { display: flex; gap: 0.25rem; }
 
@@ -36,37 +36,37 @@
 .file-viewer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .file-info-bar {
   padding: 0.75rem 1rem;
-  background: #fff7f5;
-  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.05);
+  border-bottom: 1px solid #e5e7eb;
 }
 .file-meta {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--text-muted);
+  color: #6b7280;
   font-size: 0.9rem;
 }
-.file-meta i { color: var(--primary); }
+.file-meta i { color: rgba(0,0,0,0.85); }
 .file-name {
-  color: var(--text);
+  color: #1f2937;
   font-weight: 600;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 .file-size {
   margin-left: auto;
   padding: 0.2rem 0.5rem;
-  background: var(--primary-100);
+  background: #dbeafe;
   border-radius: 6px;
   font-size: 0.8rem;
-  color: #0b3c9d;
-  border: 1px solid var(--primary-200);
+  color: rgba(0,0,0,0.85);
+  border: 1px solid #bfdbfe;
 }
 
 /* Code Container */
 .code-container {
   flex: 1;
   overflow: auto;
-  background: var(--panel-2);
+  background: #fafafa;
   padding: 1rem;
 }
 .code-block {
