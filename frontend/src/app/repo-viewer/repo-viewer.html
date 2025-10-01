@@ -11,11 +11,11 @@
 
           @if (repoData) {
             <div class="repo-name-wrapper">
-              <span class="owner-name">{{ repoData?.owner?.login ?? '—' }}</span>
+              <span class="owner-name">{{ repoData.owner.login }}</span>
               <span class="separator">/</span>
-              <span class="repo-name">{{ repoData?.name ?? '—' }}</span>
+              <span class="repo-name">{{ repoData.name }}</span>
 
-              @if (repoData?.private) {
+              @if (repoData.private) {
                 <p-chip label="Private" icon="pi pi-lock" styleClass="private-badge"></p-chip>
               } @else {
                 <p-chip label="Public" icon="pi pi-globe" styleClass="public-badge"></p-chip>
@@ -41,23 +41,23 @@
           <div class="repo-stats">
             <div class="stat-item" pTooltip="Stars">
               <i class="pi pi-star"></i>
-              <span>{{ repoData?.stargazers_count ?? 0 }}</span>
+              <span>{{ repoData.stargazers_count }}</span>
             </div>
             <div class="stat-item" pTooltip="Forks">
               <i class="pi pi-share-alt"></i>
-              <span>{{ repoData?.forks_count ?? 0 }}</span>
+              <span>{{ repoData.forks_count }}</span>
             </div>
             <div class="stat-item" pTooltip="Watchers">
               <i class="pi pi-eye"></i>
-              <span>{{ repoData?.watchers_count ?? 0 }}</span>
+              <span>{{ repoData.watchers_count }}</span>
             </div>
-            @if (repoData?.language) {
+            @if (repoData.language) {
               <div class="stat-item" pTooltip="Primary Language">
                 <span
                   class="language-dot"
                   [style.backgroundColor]="githubService.getLanguageColor(repoData.language)"
                 ></span>
-                <span>{{ repoData?.language }}</span>
+                <span>{{ repoData.language }}</span>
               </div>
             }
           </div>
@@ -79,12 +79,12 @@
   <div class="branch-selector-wrapper">
     <div class="branch-controls">
       <p-select
-        [options]="branches ?? []"
+        [options]="branches"
         [(ngModel)]="selectedBranch"
         optionLabel="name"
         optionValue="name"
         placeholder="Select Branch"
-        [loading]="loading?.branches"
+        [loading]="loading.branches"
         (onChange)="onBranchChange()"
         styleClass="branch-dropdown"
       >
@@ -112,11 +112,11 @@
         <div class="repo-meta">
           <span class="meta-item">
             <i class="pi pi-calendar"></i>
-            Created {{ formatDate(repoData?.created_at ?? '') }}
+            Created {{ formatDate(repoData.created_at) }}
           </span>
           <span class="meta-item">
             <i class="pi pi-refresh"></i>
-            Updated {{ formatDate(repoData?.updated_at ?? '') }}
+            Updated {{ formatDate(repoData.updated_at) }}
           </span>
         </div>
       }
@@ -130,15 +130,15 @@
       <div class="panel-header">
         <i class="pi pi-folder-open"></i>
         <span>Files</span>
-        <p-badge [value]="(fileTree?.length ?? 0)" styleClass="file-count"></p-badge>
+        <p-badge [value]="fileTree.length" styleClass="file-count"></p-badge>
       </div>
 
       <div class="tree-container">
-        @if (loading?.tree) {
+        @if (loading.tree) {
           <p-progressSpinner strokeWidth="3" styleClass="tree-loader"></p-progressSpinner>
         } @else {
           <p-tree
-            [value]="fileTree ?? []"
+            [value]="fileTree"
             selectionMode="single"
             (onNodeSelect)="onNodeSelect($event)"
             [filter]="true"
@@ -162,7 +162,7 @@
     <!-- File Content Area -->
     <div class="file-content-panel">
       <!-- Breadcrumb -->
-      @if ((breadcrumbs?.length ?? 0) > 0) {
+      @if (breadcrumbs.length > 0) {
         <div class="breadcrumb-bar">
           <div class="breadcrumb-path">
             <span class="breadcrumb-item" *ngFor="let crumb of breadcrumbs; let last = last">
@@ -175,13 +175,11 @@
             <div class="file-actions">
               <p-button
                 icon="pi pi-copy"
-                pTooltip="Copy content"
                 styleClass="p-button-text p-button-sm"
-                (onClick)="copyToClipboard(fileContent ?? '')"
+                (onClick)="copyToClipboard(fileContent)"
               ></p-button>
               <p-button
                 icon="pi pi-download"
-                pTooltip="Download file"
                 styleClass="p-button-text p-button-sm"
                 (onClick)="downloadFile()"
               ></p-button>
@@ -195,25 +193,25 @@
         <div class="file-viewer">
           <div class="file-info-bar">
             <div class="file-meta">
-              <i [class]="getFileIconClass(selectedFile?.name ?? '')"></i>
-              <span class="file-name">{{ selectedFile?.name ?? '—' }}</span>
-              <span class="file-size">{{ formatFileSize(selectedFile?.size ?? 0) }}</span>
+              <i [class]="getFileIconClass(selectedFile.name)"></i>
+              <span class="file-name">{{ selectedFile.name }}</span>
+              <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
             </div>
           </div>
 
           <div class="code-container">
-            @if (loading?.file) {
+            @if (loading.file) {
               <p-progressSpinner strokeWidth="3"></p-progressSpinner>
             } @else {
               <!-- No [highlight]; show as text -->
-              <pre class="code-block"><code>{{ fileContent ?? '' }}</code></pre>
+              <pre class="code-block"><code>{{ fileContent }}</code></pre>
             }
           </div>
         </div>
       }
 
       <!-- Empty State -->
-      @if (!selectedFile && !loading?.tree) {
+      @if (!selectedFile && !loading.tree) {
         <div class="empty-state">
           <i class="pi pi-file-o" style="font-size: 3rem; color: #8b949e;"></i>
           <h3>Select a file to view</h3>
@@ -229,7 +227,7 @@
           <h3>Error</h3>
           <p>{{ error }}</p>
           <p-button label="Retry" icon="pi pi-refresh" (onClick)="loadRepository()"></p-button>
-          <p-message severity="error" [text]="error ?? 'An error occurred.'"></p-message>
+          <p-message severity="error" [text]="error"></p-message>
         </div>
       }
     </div>
