@@ -23,15 +23,15 @@ class GithubContentFetcher:
         self.repo = repo
         self.max_file_bytes = max_file_bytes
 
-        tok = token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+        self.token = token or os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
         
         self.headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": api_version,
         }
         
-        if tok:
-            self.headers["Authorization"] = f"Bearer {tok}"
+        if self.token:
+            self.headers["Authorization"] = f"Bearer {self.token}"
 
         self.session = requests.Session()
         self.session.headers.update(self.headers)
@@ -42,11 +42,12 @@ class GithubContentFetcher:
         Returns a ZipFile object.
         """
         url = f"https://api.github.com/repos/{self.owner}/{self.repo}/zipball/{ref}"
+        print(url, self.token)
         r = self.session.get(url, timeout=60)
         r.raise_for_status()
         return zipfile.ZipFile(io.BytesIO(r.content))
 
-    def walk_files(self, ref="main"):
+    def walk_files(self, ref="origin"):
         """
         Yield file info dicts from the zipball.
         Structure is similar to your previous walk_files.

@@ -11,7 +11,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-_retrieval_chain = {}
+_retrieval_cache = {}
 
 def build_retrieval_chain(username, repo_name, branch="origin", token=None):
     """
@@ -19,8 +19,8 @@ def build_retrieval_chain(username, repo_name, branch="origin", token=None):
     """
 
     key = f"{username}_{repo_name}_{branch}"
-    if key in _retrieval_chain:
-        return _retrieval_chain[key]
+    if key in _retrieval_cache:
+        return _retrieval_cache[key]
     
     fetcher = GithubContentFetcher(owner=username, repo=repo_name, token=token)
     files = fetcher.walk_files(branch)
@@ -61,9 +61,8 @@ def run_query(username, repo_name, query, branch="origin", token=None):
     """
     Run a query against the retrieval chain for the given user and repo.
     """
-
     chain = build_retrieval_chain(username, repo_name, branch, token)
-    return chain.invoke({"question": query})
+    return chain.invoke(query)
 
 if __name__ == "__main__":
     query = "Who are you and what is your task"
