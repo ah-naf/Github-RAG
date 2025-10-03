@@ -11,45 +11,63 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-fetcher = GithubContentFetcher("ah-naf", "nlsql")
+_retrieval_chain = {}
 
-files = fetcher.walk_files("origin")
+def build_retrieval_chain(username, repo_name, branch="origin", token=None):
+    """
+    Build (or load from cache) the retrieval chain for a given user and repo.
+    """
 
-docs = []
-for file in files:
-    meta = {k: v for k, v in file.items() if k != "chunks"}
-
-    if "meta" in meta and isinstance(meta["meta"], dict):
-        for k, v in meta["meta"].items():
-            meta[f"meta_{k}"] = v
-        del meta["meta"]
+    key = f"{username}_{repo_name}_{branch}"
+    if key in _retrieval_chain:
+        return _retrieval_chain[key]
     
-    for chunk in file.get("chunks"):
-        docs.append(Document(
-            page_content = chunk,
-            metadata = meta
-        ))
+    fetcher = GithubContentFetcher(owner=username, repo=repo_name, token=token)
+    files = fetcher.walk_files(branch)
 
+    docs = []
+    for file in files:
+        meta = {k: v for k, v in file.items() if k != "chunks"}
+        if "meta" in meta and isinstance(meta["meta"], dict):
+            for k, v in meta["meta"].items():
+                meta[f"meta_{k}"] = v
+            del meta["meta"]
 
-hybrid_retriever = HybridRetriever(docs).get_retriever()
+        for chunk in file.get("chunks"):
+            docs.append(Document(page_content=chunk, metadata=meta))
+    
+    persist_dir = f"./chroma_db/{username}_{repo_name}"
 
-prompt = Prompt().get_prompt()
+    hybrid_retriever = HybridRetriever(docs, persist_directory=persist_dir).get_retriever()
 
-def format_docs(docs):
-    return "\n\n".join([f"[{d.metadata.get('path')}] {d.page_content}" for d in docs])
+    prompt = Prompt().get_prompt()
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.25)
 
+    def format_docs(docs):
+        return "\n\n".join([f"[{d.metadata.get('path')}] {d.page_content}" for d in docs])
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    retrieval_chain = (
+        {"context": hybrid_retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
 
-retrieval_chain = (
-    {"context": hybrid_retriever | format_docs, "question": RunnablePassthrough()}
-    | prompt
-    | llm
-    | StrOutputParser()
-)
+    # Cache it
+    _retrieval_cache[key] = retrieval_chain
+    return retrieval_chain
 
-query = "Who are you and what is your task"
-answer = retrieval_chain.invoke(query)
+def run_query(username, repo_name, query, branch="origin", token=None):
+    """
+    Run a query against the retrieval chain for the given user and repo.
+    """
 
-print("Q:", query)
-print("A:", answer)
+    chain = build_retrieval_chain(username, repo_name, branch, token)
+    return chain.invoke({"question": query})
+
+if __name__ == "__main__":
+    query = "Who are you and what is your task"
+    answer = run_query("ah-naf", "nlsql", query)
+
+    print("Q:", query)
+    print("A:", answer)
