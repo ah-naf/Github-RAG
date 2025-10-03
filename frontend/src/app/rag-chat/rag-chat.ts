@@ -1,63 +1,62 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import * as marked from 'marked';
-
-interface ChatMessage {
-  text: string;
-  sender: 'user' | 'bot';
-  loading?: boolean;
-}
+import { ChatMessage } from '../type';
+import { RagService } from '../services/rag-service';
 
 @Component({
   selector: 'app-rag-chat',
   templateUrl: './rag-chat.html',
   imports: [CommonModule, FormsModule],
-  styleUrls: ['./rag-chat.css']
+  standalone: true,
+  styleUrls: ['./rag-chat.css'],
 })
 export class RagChatComponent {
-  messages: ChatMessage[] = [
-    {
-      text: 'Hello! 👋 I am your Repo Assistant.',
-      sender: 'bot'
-    },
-    {
-      text: 'Hi, can you show me the README file?',
-      sender: 'user'
-    },
-    {
-      text: marked.parse('Sure! Here’s the **README.md** file summary:') as string,
-      sender: 'bot'
-    },
-    {
-      text: 'Thanks, that helps a lot!',
-      sender: 'user'
-    }
-  ];
+  @Input() selectedBranch: string = 'origin';
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
+
+  messages: ChatMessage[] = [];
   inputValue: string = '';
+  isLoading = false;
+
+  constructor(private ragService: RagService) {}
 
   sendMessage() {
     if (!this.inputValue.trim()) return;
 
-    // Push user message
-    this.messages.push({ text: this.inputValue, sender: 'user' });
+    const userMessage: ChatMessage = { text: this.inputValue, sender: 'user' };
+    this.messages.push(userMessage);
+    const botMessage: ChatMessage = { text: '', sender: 'bot', loading: true };
+    this.messages.push(botMessage);
 
-    // Add temporary loading bubble for bot
-    this.messages.push({ text: '', sender: 'bot', loading: true });
+    this.scrollToBottom();
 
-    const userInput = this.inputValue;
+    const question = this.inputValue;
     this.inputValue = '';
+    this.isLoading = true;
 
-    // Simulate async response
+    this.ragService.askQuestion(question, this.selectedBranch).subscribe({
+      next: (response) => {
+        botMessage.text = marked.parse(response.text) as string;
+        botMessage.loading = false;
+        this.isLoading = false;
+        this.scrollToBottom();
+      },
+      error: (error) => {
+        botMessage.text = 'Error: ' + error.message;
+        botMessage.loading = false;
+        this.isLoading = false;
+        this.scrollToBottom();
+      },
+    });
+  }
+
+  scrollToBottom() {
     setTimeout(() => {
-      // Remove loading
-      this.messages = this.messages.filter(m => !m.loading);
-
-      // Push bot reply (markdown rendered)
-      this.messages.push({
-        text: marked.parse(`**Bot:** I received: ${userInput}`) as string,
-        sender: 'bot'
-      });
-    }, 1500);
+      if (this.chatContainer) {
+        this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;
+      }
+    }, 100);
   }
 }

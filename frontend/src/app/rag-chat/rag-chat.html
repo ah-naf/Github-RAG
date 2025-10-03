@@ -1,6 +1,6 @@
 <div class="rag-chat-container">
   <!-- Chat Body -->
-  <div class="rag-chat-body">
+  <div #chatContainer class="rag-chat-body">
     <!-- Placeholder -->
     <div *ngIf="messages.length === 0" class="placeholder">
       <p>💬 Start chatting with your repo...</p>
@@ -16,13 +16,13 @@
       </div>
 
       <!-- Normal bubble -->
-      <div *ngIf="!msg.loading" class="bubble" [ngClass]="msg.sender" [innerHTML]="msg.text"></div>
+      <div *ngIf="!msg.loading" class="bubble markdown-body" [ngClass]="msg.sender" [innerHTML]="msg.text"></div>
     </div>
   </div>
 
   <!-- Input -->
   <div class="rag-chat-input">
     <input [(ngModel)]="inputValue" (keyup.enter)="sendMessage()" placeholder="Type your message..." />
-    <button (click)="sendMessage()">Send</button>
+    <button (click)="sendMessage()" [disabled]="isLoading">Send</button>
   </div>
 </div>

@@ -45,8 +45,8 @@
     </div>
   </div>
 
-  <p-drawer header="Chat with {{ repoData?.name }}" [(visible)]="visible" position="right" styleClass="custom-drawer">
-    <app-rag-chat></app-rag-chat>
+  <p-drawer header="Chat with {{ repoData?.name }}@{{ selectedBranch }}" [(visible)]="visible" position="right" styleClass="custom-drawer">
+    <app-rag-chat [selectedBranch]="selectedBranch"></app-rag-chat>
   </p-drawer>
   <div>
     <button (click)="visible = true" class="drawer-button">

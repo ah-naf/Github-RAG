@@ -45,3 +45,9 @@ export interface FileContent {
   type: string;
   download_url: string;
 }
+
+export interface ChatMessage {
+  text: string;
+  sender: 'user' | 'bot';
+  loading?: boolean;
+}

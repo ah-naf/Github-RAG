@@ -36,7 +36,7 @@ def build_retrieval_chain(username, repo_name, branch="origin", token=None):
         for chunk in file.get("chunks"):
             docs.append(Document(page_content=chunk, metadata=meta))
     
-    persist_dir = f"./chroma_db/{username}_{repo_name}"
+    persist_dir = f"./chroma_db/{username}_{repo_name}_{branch}"
 
     hybrid_retriever = HybridRetriever(docs, persist_directory=persist_dir).get_retriever()
 

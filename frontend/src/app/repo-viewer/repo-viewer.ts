@@ -13,7 +13,6 @@ import { GithubService } from '../services/github-service';
 import { RepoViewerTopbar } from './topbar/topbar';
 import { RepoViewerSidebarFiles } from './sidebar-files/sidebar-files';
 import { RepoViewerCodeViewer } from './code-viewer/code-viewer';
-import { Button } from "primeng/button";
 import { RagChatComponent } from "../rag-chat/rag-chat";
 
 @Component({
