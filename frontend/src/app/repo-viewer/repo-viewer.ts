@@ -14,11 +14,12 @@ import { RepoViewerTopbar } from './topbar/topbar';
 import { RepoViewerSidebarFiles } from './sidebar-files/sidebar-files';
 import { RepoViewerCodeViewer } from './code-viewer/code-viewer';
 import { Button } from "primeng/button";
+import { RagChatComponent } from "../rag-chat/rag-chat";
 
 @Component({
   selector: 'app-repo-viewer',
   standalone: true,
-  imports: [CommonModule, Toast, RepoViewerTopbar, RepoViewerSidebarFiles, RepoViewerCodeViewer, Drawer, Button],
+  imports: [CommonModule, Toast, RepoViewerTopbar, RepoViewerSidebarFiles, RepoViewerCodeViewer, Drawer, RagChatComponent],
   providers: [MessageService],
   templateUrl: './repo-viewer.html',
   styleUrl: './repo-viewer.css',
