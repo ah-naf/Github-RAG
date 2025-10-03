@@ -48,7 +48,7 @@ retrieval_chain = (
     | StrOutputParser()
 )
 
-query = "How does the project fetch schema for a given connection string?"
+query = "Who are you and what is your task"
 answer = retrieval_chain.invoke(query)
 
 print("Q:", query)

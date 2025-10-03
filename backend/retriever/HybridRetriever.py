@@ -2,6 +2,8 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.retrievers import BM25Retriever
 from langchain.retrievers import EnsembleRetriever
 from langchain_huggingface import HuggingFaceEmbeddings
+import os
+import pickle
 
 class HybridRetriever:
     def __init__(
@@ -27,18 +29,41 @@ class HybridRetriever:
 
         # Create embeddings + Chroma
         embeddings = HuggingFaceEmbeddings(model_name=embedding_model)
-        vectorstore = Chroma.from_documents(
-            documents=docs,
-            embedding=embeddings,
-            persist_directory=persist_directory,
-        )
-        vectorstore.persist()
+
+        if os.path.exists(persist_directory) and len(os.listdir(persist_directory)) > 0:
+            vectorstore = Chroma(
+                persist_directory=persist_directory,
+                embedding_function=embeddings,
+            )
+        else:
+            if docs is None:
+                raise ValueError("No persisted DB found, and no docs provided to build one.")
+            
+            vectorstore = Chroma.from_documents(
+                documents=docs,
+                embedding=embeddings,
+                persist_directory=persist_directory,
+            )
+            vectorstore.persist()
 
         # Dense retriever
         dense_retriever = vectorstore.as_retriever(search_kwargs={"k": dense_k})
 
-        # Sparse retriever (BM25)
-        sparse_retriever = BM25Retriever.from_documents(docs)
+        bm25_path = os.path.join(persist_directory, "bm25.pkl")
+        
+        if os.path.exists(bm25_path):
+            # Load BM25 retriever from pickle
+            with open(bm25_path, "rb") as f:
+                sparse_retriever = pickle.load(f)
+        else:
+            if docs is None:
+                raise ValueError("No docs provided to build BM25 index.")
+            sparse_retriever = BM25Retriever.from_documents(docs)
+            sparse_retriever.k = sparse_k
+            # Persist BM25 retriever
+            with open(bm25_path, "wb") as f:
+                pickle.dump(sparse_retriever, f)
+        
         sparse_retriever.k = sparse_k
 
         # Hybrid retriever
