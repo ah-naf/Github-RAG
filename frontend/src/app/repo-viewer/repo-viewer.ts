@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 
 import { TreeNode, MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
+import { Drawer } from 'primeng/drawer'
 
 import { FileContent, GitHubBranch, GitHubRepo, GitHubTreeItem } from '../type';
 import { GithubService } from '../services/github-service';
@@ -12,11 +13,12 @@ import { GithubService } from '../services/github-service';
 import { RepoViewerTopbar } from './topbar/topbar';
 import { RepoViewerSidebarFiles } from './sidebar-files/sidebar-files';
 import { RepoViewerCodeViewer } from './code-viewer/code-viewer';
+import { Button } from "primeng/button";
 
 @Component({
   selector: 'app-repo-viewer',
   standalone: true,
-  imports: [CommonModule, Toast, RepoViewerTopbar, RepoViewerSidebarFiles, RepoViewerCodeViewer],
+  imports: [CommonModule, Toast, RepoViewerTopbar, RepoViewerSidebarFiles, RepoViewerCodeViewer, Drawer, Button],
   providers: [MessageService],
   templateUrl: './repo-viewer.html',
   styleUrl: './repo-viewer.css',
@@ -36,6 +38,7 @@ export class RepoViewer implements OnInit {
   };
   breadcrumbs: string[] = [];
   error: string | null = null;
+  visible = false;
 
   constructor(
     public githubService: GithubService,

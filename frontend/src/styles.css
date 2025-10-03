@@ -12,3 +12,22 @@ body, input, button, label, p, h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
 }
+
+.p-drawer-right {
+  width: 40rem !important; /* ~640px */
+  max-width: 100vw; /* prevent overflow on small screens */
+}
+
+/* Tablet screens */
+@media (max-width: 1024px) {
+  .p-drawer-right {
+    width: 28rem !important; /* ~448px */
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 640px) {
+  .p-drawer-right {
+    width: 100vw !important; /* full width for chat experience */
+  }
+}
